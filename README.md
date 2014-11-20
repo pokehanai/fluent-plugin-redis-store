@@ -33,18 +33,18 @@ Currently the plugin supports following Redis commands:
 
 #### _key_ string for Redis storage
 
-Redis commands require _key_ and _value_.  
+Redis commands require _key_ and _value_.
 For _key_, the plugin supports either way;
 
-1. Specify a fixed key.  
+1. Specify a fixed key.
    You can do this simply using `key` option in td-agent configuration file.
 
    ```apache
    type redis_store
    key userdata
    ```
-   
-2. Lookup a key string in every event data by a lookup path.  
+
+2. Lookup a key string in every event data by a lookup path.
    If event data have structured data like
 
    ```javascript
@@ -75,9 +75,9 @@ With the previous data, _key_ will be `outuser.Kei.accesslog`.
 
 To determine what _value_ in every event data to be srtored, you have two options;
 
-1. Store extracted data in event data, by a lookup path with `value_path` option.  
+1. Store extracted data in event data, by a lookup path with `value_path` option.
    It works like `key_path`.
-2. Store whole data.  
+2. Store whole data.
    This is default behavior. To do it, simply omit `value_path` option.
 
 Installation
@@ -123,9 +123,13 @@ No more options than common options.
 
 ### `list` storage specific options
 
-| Key     | Type   | Default                  | Description                         |
-| :----   | :----- | :----------------------- | :------------                       |
-| `order` | string | asc                      | `asc`: **rpush**, `desc`: **lpush** |
+| Key                    | Type    | Default                  | Description                                            |
+| :----                  | :-----  | :----------------------- | :------------                                          |
+| `order`                | string  | asc                      | `asc`: **rpush**, `desc`: **lpush**                    |
+| `congestion_threshold` | integer | 0                        | see Note below                                         |
+| `congestion_interval`  | integer | 1                        | How often to check for congestion. Default is 1 second |
+
+Note: In case Redis data_type is “list” and has more than @congestion_threshold items, block until someone consumes them and reduces congestion, otherwise if there are no consumers Redis will run out of memory, unless it was configured with OOM protection. But even with OOM protection, a single Redis list can block all other users of Redis, until Redis CPU consumption reaches the max allowed RAM size. A default value of 0 means that this limit is disabled. Only supported for list Redis data_type.
 
 ### `set` storage specific options
 
@@ -149,8 +153,8 @@ No more options than common options.
 Copyright
 ---------
 
-Copyright (c) 2013 moaikids  
-Copyright (c) 2014 HANAI Tohru  
+Copyright (c) 2013 moaikids
+Copyright (c) 2014 HANAI Tohru
 
 License
 -------
