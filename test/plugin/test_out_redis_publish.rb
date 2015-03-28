@@ -92,6 +92,8 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal -1, d.instance.value_expire
     assert_equal -1, d.instance.value_length
     assert_equal 'asc', d.instance.order
+    assert_equal 0, d.instance.congestion_threshold
+    assert_equal 1, d.instance.congestion_interval
   end
 
   def test_configure_host_port_db
