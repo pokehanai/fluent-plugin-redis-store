@@ -267,32 +267,6 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal message, $message
   end
 
-  def test_list_desc_with_value_limitation
-    config = %[
-      format_type plain
-      store_type list
-      key_path   stat
-      order      desc
-      value_length 3
-    ]
-    d = create_driver(config)
-    message = {
-      'user' => 'george',
-      'stat' => 'attack1',
-      'stat' => 'attack2',
-      'stat' => 'attack3',
-      'stat' => 'attack4',
-      'stat' => 'attack5',
-      'stat' => 'attack6'
-    }
-    d.emit(message, get_time)
-    d.run
-
-    assert_equal :lpush, $command
-    assert_equal "attack6", $key
-    assert_equal message, $message
-    assert_equal 3, d.instance.value_length
-  end
 
 
   def test_set
@@ -336,36 +310,6 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal "george", $key
     assert_equal 81, $score
     assert_equal message, $message
-  end
-
-  def test_zset_desc_with_limitation
-    config = %[
-      format_type plain
-      store_type zset
-      key_path   user
-      score_path result
-      value_length 4
-      order desc
-    ]
-
-    d = create_driver(config)
-    message = {
-      'user' => 'george',
-      'stat' => { 'attack' => 7 },
-      'result' => 81,
-      'result' => 101,
-      'result' => 102,
-      'result' => 103,
-      'result' => 104
-    }
-    d.emit(message, get_time)
-    d.run
-
-    assert_equal :zadd, $command
-    assert_equal "george", $key
-    assert_equal 104, $score
-    assert_equal message, $message
-    assert_equal 4, d.instance.value_length
   end
 
   def test_zset_with_no_score_path
