@@ -1,4 +1,4 @@
-require 'helpers'
+require '../helpers'
 
 require 'redis'
 
@@ -227,6 +227,7 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal message.to_msgpack, $message
   end
 
+
   def test_list_asc
     config = %[
       format_type plain
@@ -265,6 +266,8 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal "george", $key
     assert_equal message, $message
   end
+
+
 
   def test_set
     config = %[
