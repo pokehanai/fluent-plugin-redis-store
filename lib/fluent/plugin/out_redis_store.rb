@@ -99,8 +99,7 @@ module Fluent
         @redis.zremrangebyscore key , '-inf' , (now - @value_expire)
       end
       if 0 < @value_length
-        script = generate_zremrangebyrank_script(key, @value_length, @order)
-        @redis.eval script
+        exec_zremrangebyrank(key, @value_length, @order)
       end
     end
 
@@ -122,8 +121,7 @@ module Fluent
       end
       set_key_expire key
       if 0 < @value_length
-        script = generate_ltrim_script(key, @value_length, @order)
-        @redis.eval script
+        exec_ltrim(key, @value_length, @order)
       end
     end
 
@@ -141,38 +139,33 @@ module Fluent
       @redis.publish key, value
     end
 
-    def generate_zremrangebyrank_script(key, maxlen, order)
-      script  = "local key = '" + key.to_s + "'\n"
-      script += "local maxlen = " + maxlen.to_s + "\n"
-      script += "local order ='" + order.to_s + "'\n"
-      script += "local len = tonumber(redis.call('ZCOUNT', key, '-inf', '+inf'))\n"
-      script += "if len > maxlen then\n"
-      script += "    if order == 'asc' then\n"
-      script += "       local l = len - maxlen\n"
-      script += "       if l >= 0 then\n"
-      script += "           return redis.call('ZREMRANGEBYRANK', key, 0, l)\n"
-      script += "       end\n"
-      script += "    else\n"
-      script += "       return redis.call('ZREMRANGEBYRANK', key, maxlen, -1)\n"
-      script += "    end\n"
-      script += "end\n"
-      return script
+    def exec_zremrangebyrank(key, maxlen, order)
+      zcount_length = @redis.zcount(key, '-inf', '+inf')
+      excess_length = zcount_length - maxlen
+      if excess_length > maxlen
+        case order
+        when "asc"
+          #remove from 0 to excess_length
+          @redis.zremrangebyrank(key, 0, excess_length)
+        when "desc"	
+          #remove from maxlen to last element(-1)
+          @redis.zremrangebyrank(key, maxlen, -1)
+        end 	
+      end
     end
 
-    def generate_ltrim_script(key, maxlen, order)
-      script  = "local key = '" + key.to_s + "'\n"
-      script += "local maxlen = " + maxlen.to_s + "\n"
-      script += "local order ='" + order.to_s + "'\n"
-      script += "local len = tonumber(redis.call('LLEN', key))\n"
-      script += "if len > maxlen then\n"
-      script += "    if order == 'asc' then\n"
-      script += "        local l = len - maxlen\n"
-      script += "        return redis.call('LTRIM', key, l, -1)\n"
-      script += "    else\n"
-      script += "        return redis.call('LTRIM', key, 0, maxlen - 1)\n"
-      script += "    end\n"
-      script += "end\n"
-      return script
+    def exec_ltrim(key,maxlen,order)
+      list_length = @redis.llen(key)
+      if list_length > maxlen
+        #calc number of over the limit
+        excess_length = list_length - maxlen
+        case order
+        when "asc" then
+          @redis.ltrim(key, excess_length ,-1)
+        when "desc" then
+          @redis.ltrim(key,0, maxlen - excess_length)
+        end
+      end  
     end
 
     def traverse(data, key)

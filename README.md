@@ -111,6 +111,7 @@ Configuration
 | `store_type`  | string | zset                     | `string`/`list`/`set`/`zset`/`publish`               |
 | `format_type` | string | plain                    | format type for _value_ (`plain`/`json`/`msgpack`)   |
 | `key_expire`  | int    | -1                       | If set, the key will be expired in specified seconds |
+| `value_lenth` | int    | -1                       | The list or zset should be limit in specified number |
 
 Note: either `key` or `key_path` is required.
 
@@ -144,6 +145,12 @@ based on *timestamp* and it deletes expired _members_ every after new event data
 ### `publish` storage specific options
 
 No more options than common options.
+
+#### How to test
+You should add test case in test/*.rb
+And run below command
+
+> bundle exec ruby *.rb
 
 
 Copyright
