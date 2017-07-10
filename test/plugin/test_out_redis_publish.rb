@@ -92,6 +92,7 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal -1, d.instance.value_expire
     assert_equal -1, d.instance.value_length
     assert_equal 'asc', d.instance.order
+    assert_equal nil, d.instance.collision_policy
   end
 
   def test_configure_host_port_db

@@ -8,9 +8,9 @@ Redis Output Plugin For fluentd
 Background
 ----------
 
-This is folked project from [fluent-plugin-redisstore][].
+This is forked project from [fluent-plugin-redis-store][].
 
-[fluent-plugin-redisstore]: https://github.com/moaikids/fluent-plugin-redisstore
+[fluent-plugin-redis-store]: https://github.com/pokehanai/fluent-plugin-redis-store
 
 Features
 --------
@@ -43,7 +43,7 @@ For _key_, the plugin supports either way;
    type redis_store
    key userdata
    ```
-   
+
 2. Lookup a key string in every event data by a lookup path.  
    If event data have structured data like
 
@@ -83,7 +83,12 @@ To determine what _value_ in every event data to be srtored, you have two option
 Installation
 ------------
 
-    /usr/lib64/fluent/ruby/bin/fluent-gem install fluent-plugin-redis-store
+```bash
+fluent-gem install fluent-plugin-redis-store-gabfl
+
+# or if you are using td-agent:
+td-agent-gem install fluent-plugin-redis-store-gabfl
+```
 
 Configuration
 -------------
@@ -134,10 +139,11 @@ No more options than common options.
 
 ### `zset` storage specific options
 
-| Key            | Type   | Default                  | Description                                  |
-| :----          | :----- | :----------------------- | :------------                                |
-| `score_path`   | string | (_time_ of log event)    | path to lookup for _score_ in the event data |
-| `value_expire` | int    |                          | value expiration in seconds                  |
+| Key                 | Type   | Default                  | Description                                                             |
+| :----               | :----- | :----------------------- | :------------                                                           |
+| `score_path`        | string | (_time_ of log event)    | path to lookup for _score_ in the event data                            |
+| `collision_policy`  | string | (nil)                    | Only update elements that already exist (XX) or add a new element (NX)  |
+| `value_expire`      | int    |                          | value expiration in seconds                                             |
 
 If `value_expire` is set, the plugin assumes that the _score_ in the **SortedSet** is
 based on *timestamp* and it deletes expired _members_ every after new event data arrives.
