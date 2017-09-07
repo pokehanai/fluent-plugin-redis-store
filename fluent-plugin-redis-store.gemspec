@@ -2,7 +2,7 @@
 Gem::Specification.new do |gem|
     gem.name        = "fluent-plugin-redis-store"
     gem.email       = "hanai@pokelabo.co.jp"
-    gem.version     = "0.1.1"
+    gem.version     = "0.1.2"
     gem.authors     = ["moaikids", "HANAI Tohru aka pokehanai"]
     gem.licenses    = ["Apache License Version 2.0"]
     gem.summary     = %q{Redis(zset/set/list/string/publish) output plugin for Fluentd}
@@ -16,6 +16,6 @@ Gem::Specification.new do |gem|
 
     gem.add_development_dependency "rake"
     gem.add_development_dependency "test-unit"
-    gem.add_runtime_dependency "fluentd"
+    gem.add_runtime_dependency "fluentd", "~> 0.12.0"
     gem.add_runtime_dependency "redis"
 end
