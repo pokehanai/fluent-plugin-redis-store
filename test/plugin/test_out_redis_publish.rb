@@ -211,6 +211,26 @@ class RedisStoreOutputTest < Test::Unit::TestCase
     assert_equal message.to_json, $message
   end
 
+  def test_json_with_malformed_utf8
+    config = %[
+      format_type json
+      store_type string
+      key_path   user
+    ]
+    d = create_driver(config)
+    message = {
+      'user' => 'george',
+      'data' => ([0x80, 0x80].map {|x| x.chr}.join).force_encoding('UTF-8')
+
+    }
+    $ttl = nil
+    d.run(default_tag: 'test') do
+      d.feed(get_time, message)
+    end
+
+    assert_equal message, Yajl.load($message, :check_utf8 => false)
+  end
+
   def test_msgpack
     config = %[
       format_type msgpack
