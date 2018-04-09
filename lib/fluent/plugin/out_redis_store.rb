@@ -237,7 +237,7 @@ module Fluent::Plugin
       value = traverse(record, @value_path)
       case @format_type
       when 'json'
-        value.to_json
+        Yajl.dump(value)
       when 'msgpack'
         value.to_msgpack
       else
